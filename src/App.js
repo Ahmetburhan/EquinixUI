@@ -3,6 +3,8 @@ import request from 'superagent';
 //enabling lazy loading
 //import Cards from './components/Cards';
 import { Button, Form, Label, Input, Container, Row} from 'reactstrap';
+import mockdata from './mockdata.json';
+
 const Cards = lazy(() => import('./components/Cards'));
 class App extends Component {
     constructor(props) {
@@ -10,6 +12,9 @@ class App extends Component {
         this.state = {
             performers: [],
             query: "",
+            deviceName: "",
+            metroCity: "",
+            status: "",
             filteredPerformers:[],
         }
 
@@ -22,14 +27,18 @@ class App extends Component {
                 if (res.ok) {
                     console.log(res.body)
                     window.performers = res.body;
-                    console.log(window.performers)
+                    // console.log(window.performers)
                     this.setState({
                         performers : res.body
                     })
 
                 } else {
 
-                    console.log('We found nothing')
+                    this.setState({
+                        performers: mockdata
+                    })
+
+                    console.log('We found nothing so we are loading local data')
 
                 }
             })
@@ -39,7 +48,9 @@ class App extends Component {
 
     handleChange=(event)=> {
         this.setState({ query: event.target.value });
-        // console.log(this.state.query)
+        console.log(this.state.query);
+        console.log(event.target.value)
+
     }
 
     onSubmit = (event) =>{
@@ -47,17 +58,22 @@ class App extends Component {
         event.preventDefault();
         this.setState({
             query: event.target.value,
-        }, (event)=>{
-            let filteredPerformers = window.performers.filter(performer => performer.upTime == this.state.query && this.state.query);
+        })
+            let filteredPerformers = window.performers.filter(performer => {
+                console.log(performer.upTime)
+                console.log("query",this.state.query)
+
+                return performer.upTime === this.state.query && this.state.query;
+                });
             // console.log(this.state.query.toLowerCase())
-            // console.log(filteredPerformers)
+            console.log(filteredPerformers)
             this.setState({
                 performers: filteredPerformers,
             });
-            // event.target.reset() 
-        });
+             event.target.reset() 
+        };
         
-       }
+       
     onReset = () => {
         this.setState({
             performers: window.performers
@@ -67,18 +83,20 @@ class App extends Component {
     render() {
 
         return ( <div className = "App" >
-
-
+            <div className="filter" >
+            <h1 class="banner" id="filterBanner">Filter</h1>
             <Form id="filterForm" onSubmit={this.onSubmit}>
                 <Label> 
-                    <Input type="text" placeholder="Enter a Virtual Device Name" value={this.state.value} onChange={this.handleChange} id="filter"/>
+                    <Input type="text" placeholder="Enter a Virtual Device Name" value={this.state.value} onChange={this.handleChange} name="deviceName"/>
                 </Label>
 
                 <Label>
-                    <Input type="text" placeholder="Metro City" value={this.state.value} onChange={this.handleChange} id="filter" />
+                    <Input type="text" placeholder="Metro City" value={this.state.value} onChange={this.handleChange} name="metroCity" />
+            
                 </Label>
 
-                <Input type="select" placeholder="online/offline"name="select" value={this.state.value} onChange={this.handleChange}>
+                <Input type="select" name="status" value={this.state.value} onChange={this.handleChange}>
+                    <option value="" disabled placeholder="online/offline"></option>
                     <option value="true">Online</option>
                     <option value="false">Offline</option>
                 </Input>
@@ -87,6 +105,7 @@ class App extends Component {
                 <Button type="button" onClick={this.onReset}>Reset </Button>
 
             </Form>
+            </div>
 
             <Container fluid>
                 <Row>

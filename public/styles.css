@@ -112,10 +112,17 @@ label {
     
 
 }
+#filterBanner{
+    float: left;
+}
 #filterForm{
-    width: 800px;
     text-align: center;
 
+}
+.form-control{
+    display:inline;
+    width: 300px;
+    margin-left: 35px !important;
 }
 .btn-success {
     margin: 0.7rem;
